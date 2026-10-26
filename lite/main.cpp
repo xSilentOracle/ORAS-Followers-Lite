@@ -24,6 +24,7 @@ static void FollowerAssetThread(void *) {
   svcSleepThread((more?8:40)*1000000LL);
  }
 }
+void UiSendSimple(u8,u8,u8,const char*) {}
 static bool FollowerOnlyFrame(const Screen &s) {
  return s.IsTop && Overlay::OnFollowerOnlyFrame(s);
 }
