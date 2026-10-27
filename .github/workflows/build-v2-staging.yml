@@ -38,6 +38,8 @@ jobs:
           cp lite/PicaDrawArrays.hpp upstream/3ds_plugin/Includes/PicaDrawArrays.hpp
           cp lite/PicaSpriteSetup.cpp upstream/3ds_plugin/Sources/PicaSpriteSetup.cpp
           cp lite/PicaSpriteSetup.hpp upstream/3ds_plugin/Includes/PicaSpriteSetup.hpp
+          cp lite/PicaSpriteList.cpp upstream/3ds_plugin/Sources/PicaSpriteList.cpp
+          cp lite/PicaSpriteList.hpp upstream/3ds_plugin/Includes/PicaSpriteList.hpp
           python3 - <<'PY'
           from pathlib import Path
           p=Path('upstream/3ds_plugin/Sources/Overlay.cpp')
