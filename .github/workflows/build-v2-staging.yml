@@ -42,6 +42,10 @@ jobs:
           cp lite/PicaSpriteFragment.hpp upstream/3ds_plugin/Includes/PicaSpriteFragment.hpp
           cp lite/PicaSpriteList.cpp upstream/3ds_plugin/Sources/PicaSpriteList.cpp
           cp lite/PicaSpriteList.hpp upstream/3ds_plugin/Includes/PicaSpriteList.hpp
+          cp lite/PicaStateAudit.cpp upstream/3ds_plugin/Sources/PicaStateAudit.cpp
+          cp lite/PicaStateAudit.hpp upstream/3ds_plugin/Includes/PicaStateAudit.hpp
+          cp lite/PicaStateRestore.cpp upstream/3ds_plugin/Sources/PicaStateRestore.cpp
+          cp lite/PicaStateRestore.hpp upstream/3ds_plugin/Includes/PicaStateRestore.hpp
           python3 - <<'PY'
           from pathlib import Path
           p=Path('upstream/3ds_plugin/Sources/Overlay.cpp')
