@@ -34,6 +34,10 @@ jobs:
           cp lite/PicaVertexUpload.hpp upstream/3ds_plugin/Includes/PicaVertexUpload.hpp
           cp lite/SpriteQuad.cpp upstream/3ds_plugin/Sources/SpriteQuad.cpp
           cp lite/SpriteQuad.hpp upstream/3ds_plugin/Includes/SpriteQuad.hpp
+          cp lite/PicaDrawArrays.cpp upstream/3ds_plugin/Sources/PicaDrawArrays.cpp
+          cp lite/PicaDrawArrays.hpp upstream/3ds_plugin/Includes/PicaDrawArrays.hpp
+          cp lite/PicaSpriteSetup.cpp upstream/3ds_plugin/Sources/PicaSpriteSetup.cpp
+          cp lite/PicaSpriteSetup.hpp upstream/3ds_plugin/Includes/PicaSpriteSetup.hpp
           python3 - <<'PY'
           from pathlib import Path
           p=Path('upstream/3ds_plugin/Sources/Overlay.cpp')
