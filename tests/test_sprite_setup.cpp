@@ -36,7 +36,7 @@ int main(){
    Writer bad(words.data(),words.size());
    assert(!Append(bad,{0x20000001u,0x20080000u}));
    assert(bad.SizeWords()==0);
-   assert(!Append(bad,{0x1F500000u,0x20080000u}));
+   assert(!Append(bad,{0x17F00000u,0x20080000u}));
    assert(!Append(bad,{0x20000000u,0x2FFFFFF8u}));
  }
  std::puts("PICA sprite setup: texture+VBO register layout and bounds passed");
