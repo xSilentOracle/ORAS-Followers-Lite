@@ -1,0 +1,19 @@
+name: Safe native billboard staging tests
+on:
+  push:
+    branches: [native-billboard-texture-staging]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cpu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile isolated texture conversion
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -Wall -Wextra -Werror -O2 lite/NativeBillboardStage.cpp lite/test_native_billboard.cpp -o /tmp/billboard-test
+          /tmp/billboard-test
+          echo "CPU texture-staging tests passed"
