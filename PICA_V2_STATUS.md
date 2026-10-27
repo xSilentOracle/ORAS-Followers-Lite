@@ -53,3 +53,20 @@ Each module has a host-side test in the `tests/` directory with a separate GitHu
 ### Critical unresolved blocker
 
 The game's current GPU state must be preserved. A sprite draw list modifies shader code, TEV stages, vertex buffers, alpha/depth/color state, and texture bindings. The plugin needs a **verified context-save/restore strategy** or a truly isolated game render pass before it can run. The previous test crashed the Switch because it entered a separate renderer from inside the game's GPU submission hook; the new code avoids that, but correctness of live GPU queue submission and state restoration is not yet established. We do not have an ORAS/Tico GPU trace from the affected Switch and have not validated runtime behavior. Do not install a newly built GPU-output-enabled .3gx based on this branch until these issues are solved and verified.
+
+## Integrated build milestone (October 26, 2026)
+
+**Compiled cross-platform on GitHub Actions:** [Run 40448322000](https://github.com/xSilentOracle/ORAS-Followers-Lite/actions/runs/40448322000).
+
+The formerly detached modules are now linked into the same .3gx. The GpuFollower::Publish callback uses the existing 721-species decoder's offscreen RGB565 sprite, converts it to a full-size 512×256 PICA tile texture in GPU-addressable linear memory, prepares six quad vertices, and generates a bounded PICA200 draw list with a real vertex shader assembled by pinned Picasso. Each frame's sprite texture and vertices are cache-flushed. **The generated command list is NOT submitted** to the game's GPU. Consequently this artifact cannot display Pokémon and is not offered as a release.
+
+Key corrections and validation:
+
+- SpriteQuad.cpp now uses Omega Ruby's **240×400 viewport**, with a **256-pixel tiled row stride**. The earlier 256×512 viewport was incorrect; tested full-screen corner mapping in tests/test_sprite_quad.cpp.
+- GxQueuePlan::EncodeProcessList emits the full 0x01000101 GX header matching upstream libctru, not the shorthand command ID.
+- PicaTargetGuard verifies the game's render-target addresses, expected dimensions, color format and color masks; it never changes the render target.
+- PicaStateAudit and PicaStateRestore parse GPU writes, validate masks and capture reversible register bytes. They refuse to claim shader uploads and draw side effects can be reversed by register writes alone.
+- PicaShaderMirror and PicaShaderReplay capture observed shader instruction and operand uploads and emit a replay list, but do not prove full shader-state restoration.
+- Synthetic host tests pass. They do not reproduce Tico's actual Omega Ruby GPU command stream or prove the emulator accepts an injected sprite draw.
+
+**Current blocker:** Integrate a real top-screen GX submission hook with verified stream-specific shader capture, original render-target checks, and full GPU-state restoration. Validate in an emulator harness before risking a Switch install. The earlier Citro3D-in-hook build triggered a console crash and must never be reused. Until that work is verified, GpuFollower::Install deliberately performs no GPU hook.
