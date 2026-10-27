@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 #include "PicaSpriteList.hpp"
 #include "PicaDrawArrays.hpp"
+#include "PicaSpriteFragment.hpp"
 namespace PicaSpriteList {
 BuildResult Build(uint32_t* dst,size_t capacity,
                   const PicaVertexUpload::Shader& shader,
@@ -9,6 +10,7 @@ BuildResult Build(uint32_t* dst,size_t capacity,
     PicaPackets::Writer w(dst,capacity);
     if (!PicaVertexUpload::Append(w,shader))return out;
     if (!PicaSpriteSetup::Append(w,res))return out;
+    if (!PicaSpriteFragment::Append(w))return out;
     if (!PicaDrawArrays::AppendTriangles(w,0,6))return out;
     if (!w.Finalize())return out;
     out.built=true;
