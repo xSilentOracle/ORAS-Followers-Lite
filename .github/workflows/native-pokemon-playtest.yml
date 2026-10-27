@@ -42,6 +42,13 @@ jobs:
           assert code.count('slot->zone = f.zone; slot->mm = mm;')==1
           code=code.replace('slot->zone = f.zone; slot->mm = mm;',
                             'slot->zone = f.zone; slot->model = w.model; slot->mm = mm;')
+          # NPC trainer action numbers are not guaranteed valid for Pokémon
+          # overworld resources. Move their native model via PlaceModel but
+          # do not invoke trainer-specific movement animation actions.
+          marker='        // piernas: el juego anima "andar en el sitio"'
+          assert marker in code
+          code=code.replace(marker,
+           '        if (NativeFieldPokemon::IsAllowedModel(w.model)) { s_shown[w.id] = true; continue; }\n'+marker,1)
           path.write_text(code)
           PYFIELD
           
