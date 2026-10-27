@@ -1,0 +1,87 @@
+name: Native Pokémon field actor playtest 3GX
+on:
+  push:
+    branches: [native-721-model-loader]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  plugin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    container:
+      image: devkitpro/devkitarm@sha256:116afba8df8453961de2936ffab20dd441edf4d682856c1ec8b0e53d7ed0bbf5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch verified upstream source and apply offline changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone https://github.com/SamuTecYT/ORAS-MMO.git upstream
+          cd upstream
+          git checkout e19a19bf4aa287f49ce6072c53b4eb8e9b13bbad
+          cd ..
+          cp lite/native_pokemon_main.cpp upstream/3ds_plugin/Sources/main.cpp
+          cp native/NativeFieldPokemon.hpp upstream/3ds_plugin/Includes/NativeFieldPokemon.hpp
+          python3 - <<'PYFIELD'
+          from pathlib import Path
+          path=Path('upstream/3ds_plugin/Sources/GameHook.cpp')
+          code=path.read_text()
+          assert code.count('#include "GameHook.hpp"') == 1
+          code=code.replace('#include "GameHook.hpp"',
+                            '#include "GameHook.hpp"\n#include "NativeFieldPokemon.hpp"',1)
+          old='hdr[1] = (w.model == MMO_MODEL_MAY) ? 171 : 172;'
+          assert code.count(old)==1
+          code=code.replace(old,
+           'hdr[1] = NativeFieldPokemon::IsAllowedModel(w.model) ? w.model : NativeFieldPokemon::kDefault;')
+          assert code.count('u16 objId, zone;')==1
+          code=code.replace('u16 objId, zone;', 'u16 objId, zone, model;')
+          assert code.count('w.id == n.id && w.zone == f.zone')==1
+          code=code.replace('w.id == n.id && w.zone == f.zone',
+                            'w.id == n.id && w.zone == f.zone && w.model == n.model')
+          assert code.count('slot->zone = f.zone; slot->mm = mm;')==1
+          code=code.replace('slot->zone = f.zone; slot->mm = mm;',
+                            'slot->zone = f.zone; slot->model = w.model; slot->mm = mm;')
+          path.write_text(code)
+          PYFIELD
+          
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('upstream/3ds_plugin/CTRPluginFramework.plgInfo')
+          p.write_text(p.read_text().replace('ORAS MMO','ORAS Native Pokemon Playtest'))
+          PY
+      - name: Install pinned libctrpf and 3gxtool
+        shell: bash
+        run: |
+          set -euo pipefail
+          CONF=$(dkp-pacman -v -Q 2>/dev/null | sed -n 's/^Conf File *: *//p' | head -n 1)
+          [ -n "$CONF" ] || CONF=/opt/devkitpro/pacman/etc/pacman.conf
+          awk '/^\[/ { keep = ($0 == "[options]") } keep' "$CONF" > /tmp/ctrpf.conf
+          printf '\n[thepixellizeross-lib]\nServer = https://thepixellizeross.gitlab.io/packages/any\nSigLevel = Optional\n' >> /tmp/ctrpf.conf
+          printf '\n[thepixellizeross-linux]\nServer = https://thepixellizeross.gitlab.io/packages/x86_64/linux\nSigLevel = Optional\n' >> /tmp/ctrpf.conf
+          mkdir -p /tmp/pkgs
+          dkp-pacman --config /tmp/ctrpf.conf -Syw --noconfirm --cachedir /tmp/pkgs libctrpf 3gxtool
+          cd /tmp/pkgs
+          printf '%s\n' \
+            'af324bc6c27a5bee817bf7f3a3413b926891913254bb1d9abe09edbfb83d06b1  libctrpf-0.8.0.r1444-1-any.pkg.tar.zst' \
+            'ce691228a76e159ea14c0716f8169584a49ffcaaa1005158664567ede9dccd4c  3gxtool-1.3-1-x86_64.pkg.tar.zst' > pinned.sha256
+          sha256sum -c pinned.sha256
+          dkp-pacman --config /tmp/ctrpf.conf -U --noconfirm libctrpf-0.8.0.r1444-1-any.pkg.tar.zst 3gxtool-1.3-1-x86_64.pkg.tar.zst
+      - name: Compile plugin
+        shell: bash
+        env:
+          DEVKITPRO: /opt/devkitpro
+          DEVKITARM: /opt/devkitpro/devkitARM
+        run: |
+          set -euo pipefail
+          export PATH="$DEVKITARM/bin:$DEVKITPRO/tools/bin:$PATH"
+          make -C upstream/3ds_plugin
+          test -s upstream/3ds_plugin/3ds_plugin.3gx
+          mkdir -p out
+          cp upstream/3ds_plugin/3ds_plugin.3gx out/OrasNativePokemonPlaytest.3gx
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: OrasNativePokemonPlaytest-3gx
+          path: out/OrasNativePokemonPlaytest.3gx
+          retention-days: 14
