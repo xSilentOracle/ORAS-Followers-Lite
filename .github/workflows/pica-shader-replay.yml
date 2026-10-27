@@ -1,0 +1,20 @@
+name: Validate PICA game shader replay
+on:
+  push:
+    branches: [pica-sprite-compositor-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  shader-restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile offline game GPU shader replay
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror lite/PicaPackets.cpp \
+            lite/PicaShaderMirror.cpp lite/PicaShaderReplay.cpp \
+            tests/test_shader_replay.cpp -o /tmp/shader_replay
+      - name: Check capture, serialization and re-capture
+        run: /tmp/shader_replay
