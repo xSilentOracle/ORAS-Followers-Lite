@@ -1,0 +1,19 @@
+name: Validate original game PICA framebuffer guard
+on:
+  push:
+    branches: [pica-sprite-compositor-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  target-guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile original ORAS render-target guard
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror \
+            lite/PicaTargetGuard.cpp tests/test_target_guard.cpp -o /tmp/test_target_guard
+      - name: Reject mismatched GPU render targets
+        run: /tmp/test_target_guard
