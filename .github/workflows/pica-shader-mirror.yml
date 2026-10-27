@@ -1,0 +1,19 @@
+name: Validate PICA shader upload mirror
+on:
+  push:
+    branches: [pica-sprite-compositor-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mirror-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile GPU shader mirror
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror lite/PicaPackets.cpp \
+            lite/PicaShaderMirror.cpp tests/test_shader_mirror.cpp -o /tmp/test_shader_mirror
+      - name: Verify shader capture and atomic failure behavior
+        run: /tmp/test_shader_mirror
