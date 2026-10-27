@@ -1,0 +1,31 @@
+name: Validate textured PICA sprite geometry
+on:
+  push:
+    branches: [pica-sprite-compositor-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  host-quad:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile pure 3DS billboard vertex generator
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror lite/SpriteQuad.cpp tests/test_sprite_quad.cpp -o /tmp/sprite_quad_test
+      - name: Verify UV coordinates and rotation
+        run: /tmp/sprite_quad_test
+  shader-asm:
+    runs-on: ubuntu-latest
+    container:
+      image: devkitpro/devkitarm@sha256:116afba8df8453961de2936ffab20dd441edf4d682856c1ec8b0e53d7ed0bbf5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install verified 3DS shader assembler
+        run: dkp-pacman -Sy --noconfirm --needed picasso
+      - name: Assemble PICA vertex shader
+        run: |
+          export PATH=/opt/devkitpro/tools/bin:$PATH
+          picasso -o /tmp/pcs-sprite.shbin lite/sprite_shader.v.pica
+          test -s /tmp/pcs-sprite.shbin
+          wc -c /tmp/pcs-sprite.shbin
