@@ -1,0 +1,18 @@
+name: Validate offline PICA sprite draw sequence
+on:
+  push:
+    branches: [pica-sprite-compositor-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  draw-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile PICA sprite draw packet builder
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror lite/PicaPackets.cpp \
+            lite/PicaDrawArrays.cpp tests/test_pica_draw.cpp -o /tmp/test_draw
+      - name: Verify C3D_DrawArrays register sequence
+        run: /tmp/test_draw
