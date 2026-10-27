@@ -24,6 +24,10 @@ jobs:
           cp lite/GpuFollower.hpp upstream/3ds_plugin/Includes/GpuFollower.hpp
           cp lite/PicaFrameCodec.cpp upstream/3ds_plugin/Sources/PicaFrameCodec.cpp
           cp lite/PicaFrameCodec.hpp upstream/3ds_plugin/Includes/PicaFrameCodec.hpp
+          cp lite/GxQueuePlan.cpp upstream/3ds_plugin/Sources/GxQueuePlan.cpp
+          cp lite/GxQueuePlan.hpp upstream/3ds_plugin/Includes/GxQueuePlan.hpp
+          cp lite/GxQueueBridge.cpp upstream/3ds_plugin/Sources/GxQueueBridge.cpp
+          cp lite/GxQueueBridge.hpp upstream/3ds_plugin/Includes/GxQueueBridge.hpp
           python3 - <<'PY'
           from pathlib import Path
           p=Path('upstream/3ds_plugin/Sources/Overlay.cpp')
