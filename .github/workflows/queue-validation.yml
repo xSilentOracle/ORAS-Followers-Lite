@@ -1,0 +1,19 @@
+name: Validate GX queue planning (no GPU submission)
+on:
+  push:
+    branches: [pica-sprite-compositor-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  queue-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile pure queue-ordering code
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror \
+            lite/GxQueuePlan.cpp tests/test_gx_queue_plan.cpp -o /tmp/test_queue_plan
+      - name: Run queue state machine tests
+        run: /tmp/test_queue_plan
