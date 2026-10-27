@@ -1,0 +1,19 @@
+name: Validate PICA command-list encoder
+on:
+  push:
+    branches: [pica-sprite-compositor-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  packet-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile PICA packet serializer with warnings as errors
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror \
+            lite/PicaPackets.cpp tests/test_pica_packets.cpp -o /tmp/test_pica_packets
+      - name: Verify wire encoding and size bounds
+        run: /tmp/test_pica_packets
