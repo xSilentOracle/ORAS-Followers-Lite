@@ -5,7 +5,7 @@
 #include <cstdio>
 using namespace GxQueuePlan;
 struct Recorder {
- std::array<Command,6> recorded{};
+ std::array<Command,16> recorded{};
  int count=0;
  bool fail_injection=false;
 };
