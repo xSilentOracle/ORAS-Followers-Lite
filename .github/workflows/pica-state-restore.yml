@@ -1,0 +1,20 @@
+name: Validate PICA reversible state restoration
+on:
+  push:
+    branches: [pica-sprite-compositor-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  restore-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile bounded PICA GPU restore builder
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror lite/PicaPackets.cpp \
+            lite/PicaStateAudit.cpp lite/PicaStateRestore.cpp \
+            tests/test_pica_state_restore.cpp -o /tmp/pica_state_restore
+      - name: Run reversible restore and unsafe state tests
+        run: /tmp/pica_state_restore
