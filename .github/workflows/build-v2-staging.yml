@@ -48,6 +48,8 @@ jobs:
           cp lite/PicaStateRestore.hpp upstream/3ds_plugin/Includes/PicaStateRestore.hpp
           cp lite/PicaShaderMirror.cpp upstream/3ds_plugin/Sources/PicaShaderMirror.cpp
           cp lite/PicaShaderMirror.hpp upstream/3ds_plugin/Includes/PicaShaderMirror.hpp
+          cp lite/PicaShaderReplay.cpp upstream/3ds_plugin/Sources/PicaShaderReplay.cpp
+          cp lite/PicaShaderReplay.hpp upstream/3ds_plugin/Includes/PicaShaderReplay.hpp
           python3 - <<'PY'
           from pathlib import Path
           p=Path('upstream/3ds_plugin/Sources/Overlay.cpp')
