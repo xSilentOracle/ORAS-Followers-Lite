@@ -1,0 +1,18 @@
+name: Validate native PICA sprite texture and VBO bindings
+on:
+  push:
+    branches: [pica-sprite-compositor-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  setup-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile native PICA texture and vertex registers
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror lite/PicaPackets.cpp \
+            lite/PicaSpriteSetup.cpp tests/test_sprite_setup.cpp -o /tmp/test_sprite_setup
+      - name: Verify register configuration and bounds
+        run: /tmp/test_sprite_setup
