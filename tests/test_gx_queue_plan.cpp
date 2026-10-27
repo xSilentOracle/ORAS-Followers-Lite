@@ -22,7 +22,7 @@ int main(){
  Command scratch{}; assert(EncodeProcessList(scratch,0x14000000u,64,true));
  Command list{};
  assert(EncodeProcessList(list,0x14000000u,0x1000,true));
- assert(list.words[0]==1&&list.words[1]==0x14000000u&&list.words[7]==1u);
+ assert(list.words[0]==0x01000101u&&list.words[1]==0x14000000u&&list.words[7]==1u);
  assert(!EncodeProcessList(list,0x14000001u,0x1000,true));
  assert(!EncodeProcessList(list,0x14000000u,0x1003,true));
  assert(!EncodeProcessList(list,0x14000000u,0,true));
