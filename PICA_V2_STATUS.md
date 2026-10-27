@@ -34,3 +34,22 @@ Neither a trainer model reskin nor a game-specific static texture replacement is
 4. Validate the sequence using an emulator GPU trace and confirm 3× surfaces are retained, **before** any Switch install recommendation.
 
 **No new release .3gx is available yet. Do not install any earlier crashed `OrasPicaPokemonExperimental.3gx`.**
+
+## 2026-10-26: Native PICA list development
+
+I replaced the unsafe Citro3D-in-GX-hook approach with an offline native PICA command-list implementation. Files added:
+
+- `PicaPackets.hpp/.cpp`: bounded PICA register packet writer, including masked, incremental and non-incremental writes and correct 16-byte finalization. Validated against libctru's `GPUCMD_AddInternal` implementation.
+- `SpriteQuad.hpp/.cpp`: builds two textured triangles in ORAS's 256x512 rotated 3DS render-target coordinates, using the sprite's original 400x240 logical frame bounds.
+- `sprite_shader.v.pica`: pass-through PICA vertex shader. Verified that source assembles using pinned upstream devkitPro Picasso commit `d522455ea59cd5cb9219c699b93eb7750039233c`.
+- `PicaVertexUpload.hpp/.cpp`: emits PICA shader-code/operand/outmap commands derived from libctru's implementation.
+- `PicaSpriteSetup.hpp/.cpp`: emits transparent RGBA8 texture sampling and 6-vertex input bindings, matching citro3d's `texture.c`, `attribs.c` and `buffers.c`.
+- `PicaDrawArrays.hpp/.cpp`: emits the native 11-register draw sequence matching `C3D_DrawArrays(GPU_TRIANGLES)`.
+- `PicaSpriteFragment.hpp/.cpp`: alpha blending and pass-through TEV source texture stage based on citro3d.
+- `PicaSpriteList.hpp/.cpp`: composes the offline shader, texture, fragment and triangle draw packets in one list. **Explicitly returns `safe_to_submit=false`.**
+
+Each module has a host-side test in the `tests/` directory with a separate GitHub Action. The ARM 3GX compile workflow includes all modules. **No code on this branch sends the composed PICA commands to the real GPU.**
+
+### Critical unresolved blocker
+
+The game's current GPU state must be preserved. A sprite draw list modifies shader code, TEV stages, vertex buffers, alpha/depth/color state, and texture bindings. The plugin needs a **verified context-save/restore strategy** or a truly isolated game render pass before it can run. The previous test crashed the Switch because it entered a separate renderer from inside the game's GPU submission hook; the new code avoids that, but correctness of live GPU queue submission and state restoration is not yet established. We do not have an ORAS/Tico GPU trace from the affected Switch and have not validated runtime behavior. Do not install a newly built GPU-output-enabled .3gx based on this branch until these issues are solved and verified.
