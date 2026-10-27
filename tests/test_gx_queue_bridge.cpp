@@ -11,7 +11,8 @@ struct Recorder {
 };
 bool Push(void* user,const Command& c) {
  auto& recorder=*static_cast<Recorder*>(user);
- if ((c.words[0]&0xFF)==kProcessCommandList && recorder.fail_injection)
+ if ((c.words[0]&0xFF)==kProcessCommandList && recorder.fail_injection &&
+     c.words[1] == 0x14002000u)
      return false;
  assert(recorder.count < (int)recorder.recorded.size());
  recorder.recorded[recorder.count++]=c;
