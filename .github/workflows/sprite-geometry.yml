@@ -17,15 +17,22 @@ jobs:
         run: /tmp/sprite_quad_test
   shader-asm:
     runs-on: ubuntu-latest
-    container:
-      image: devkitpro/devkitarm@sha256:116afba8df8453961de2936ffab20dd441edf4d682856c1ec8b0e53d7ed0bbf5
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - name: Install verified 3DS shader assembler
-        run: dkp-pacman -Sy --noconfirm --needed picasso
-      - name: Assemble PICA vertex shader
+      - name: Build pinned picasso assembler from source
         run: |
-          export PATH=/opt/devkitpro/tools/bin:$PATH
-          picasso -o /tmp/pcs-sprite.shbin lite/sprite_shader.v.pica
-          test -s /tmp/pcs-sprite.shbin
-          wc -c /tmp/pcs-sprite.shbin
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq autoconf automake libtool
+          git clone https://github.com/devkitPro/picasso.git /tmp/picasso
+          git -C /tmp/picasso checkout d522455ea59cd5cb9219c699b93eb7750039233c
+          cd /tmp/picasso
+          ./autogen.sh
+          ./configure --prefix=/tmp/picasso-installed
+          make -j2
+          make install
+      - name: Assemble PICA pass-through vertex shader
+        run: |
+          /tmp/picasso-installed/bin/picasso -o /tmp/sprite.shbin lite/sprite_shader.v.pica
+          test -s /tmp/sprite.shbin
+          wc -c /tmp/sprite.shbin
