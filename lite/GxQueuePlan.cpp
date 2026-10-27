@@ -62,7 +62,8 @@ bool EncodeProcessList(Command& out, uint32_t address, uint32_t bytes,
        bytes > (4u << 20)) return false;
     // This just *describes* a GX packet for testing.
     // Word7 is a boolean flush flag according to the shared memory spec.
-    out.words[0]=kProcessCommandList;
+    // libctru gx.c: 0x01000100 | GX_ProcessCommandList (type=1).
+    out.words[0]=0x01000100u | kProcessCommandList;
     out.words[1]=address;
     out.words[2]=bytes;
     out.words[3]=0;
