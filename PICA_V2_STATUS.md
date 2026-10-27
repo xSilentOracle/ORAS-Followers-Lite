@@ -13,8 +13,8 @@ The target remains your original `mmo_pokes_3d.bin` for all 721 species, drawn a
 
 The initial PICA attempt called `C3D_FrameBegin`, `C2D_SceneBegin`, and `C3D_FrameEnd` **inside Omega Ruby's nn::gx command-submission hook**. The user reported an orange screen and Switch Lite shutdown, though their Switch recovered. That path must not be run again.
 
-The old `GpuFollower.cpp` is deliberately guarded with a compile-time `#error` on this branch, and its old installable-plugin build workflow is disabled. There is **no safe new .3gx file** from this branch.
+The old `GpuFollower.cpp` was replaced with a CPU-only scratch target and PICA swizzled RGBA8 preparation; it makes **no GPU commands and no framebuffer writes**. The old GPU-hook build workflow stays disabled. The separate `build-v2-staging.yml` now compiles the complete plugin as a **non-displaying developer integration build**; a successful compile is not a playable follower release.
 
-The next engineering task is a queue-safe GPU integration which leaves Omega Ruby's command queue ownership, VRAM target and synchronization intact. The converter passing tests does not establish this. Only after verifying a safe integration with emulator instrumentation (and code review) would compiling a test plugin make sense.
+The next engineering task is a queue-safe GPU integration which leaves Omega Ruby's command queue ownership, VRAM target and synchronization intact. The converter passing tests and the GPU-disabled .3gx building successfully do not establish this. Only after verifying a safe integration with emulator instrumentation (and code review) would compiling a test plugin make sense.
 
 Neither a trainer model reskin nor a game-specific static texture replacement is planned for this route. Keep the existing working native-render trainer test if useful for comparison, and do not install the failed PICA .3gx.
