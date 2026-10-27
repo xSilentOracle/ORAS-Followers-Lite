@@ -14,9 +14,10 @@ int main() {
     sprite.u1=400.f/512.f; sprite.v1=240.f/256.f;
     Triangles vertices{};
     assert(Build(sprite,vertices));
-    // The (0,0) screen corner maps to (239,0) in the rotated PICA canvas.
-    assert(std::abs(vertices[0].x-(2.f*(239.5f/256.f)-1.f))<1e-5f);
-    assert(std::abs(vertices[0].y-(1.f-1.f/512.f))<1e-5f);
+    // Pixel-center mapping (239-y,x) implies screen-rectangle edges at
+    // (240-y,x). The full 400x240 image fills the 240x400 viewport.
+    assert(std::abs(vertices[0].x-1.f)<1e-5f);
+    assert(std::abs(vertices[0].y-1.f)<1e-5f);
     assert(vertices[0].v==1.f&&vertices[0].u==0.f);
     assert(vertices[1].x==vertices[0].x);
     assert(vertices[1].y<vertices[0].y);
@@ -28,6 +29,8 @@ int main() {
     assert(vertices[5].x==vertices[2].x&&vertices[5].y==vertices[2].y);
     // Large-sprite full-frame coordinate range: never crop here.
     assert(vertices[4].u == 400.f/512.f);
+    assert(std::abs(vertices[4].x+1.f)<1e-5f);
+    assert(std::abs(vertices[4].y+1.f)<1e-5f);
     sprite.bounds={220,100,270,155};
     sprite.u0=220.f/512.f;sprite.u1=270.f/512.f;
     sprite.v0=100.f/256.f;sprite.v1=155.f/256.f;
