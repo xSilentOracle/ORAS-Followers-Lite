@@ -6,7 +6,47 @@ on:
 permissions:
   contents: read
 jobs:
+  shader-asset:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build pinned PICA200 shader assembler
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq autoconf automake libtool
+          git clone https://github.com/devkitPro/picasso.git /tmp/picasso
+          git -C /tmp/picasso checkout d522455ea59cd5cb9219c699b93eb7750039233c
+          cd /tmp/picasso
+          ./autogen.sh
+          ./configure --prefix=/tmp/picasso-installed
+          make -j2
+          make install
+      - name: Generate compiled pass-through shader header
+        run: |
+          /tmp/picasso-installed/bin/picasso -o /tmp/sprite.shbin lite/sprite_shader.v.pica
+          python3 - <<'PY'
+          import struct
+          from pathlib import Path
+          binary=Path('/tmp/sprite.shbin').read_bytes()
+          assert binary and len(binary)%4==0
+          ints=struct.unpack('<%dI' % (len(binary)//4),binary)
+          output=Path('shader/SpriteShaderBinary.hpp')
+          output.parent.mkdir(parents=True,exist_ok=True)
+          text='#pragma once\n#include <cstdint>\nnamespace SpriteShaderBinary {\n'
+          text+='alignas(4) static uint32_t kWords[] = {\n'
+          for i in range(0,len(ints),8):
+              text+='  '+', '.join('0x%08Xu'%v for v in ints[i:i+8])+',\n'
+          text+='};\nconstexpr uint32_t kByteSize=%d;\n}\n'%len(binary)
+          output.write_text(text)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OrasPicaShaderHeader
+          path: shader/SpriteShaderBinary.hpp
+          retention-days: 2
   plugin:
+    needs: shader-asset
     runs-on: ubuntu-latest
     timeout-minutes: 45
     container:
@@ -80,6 +120,11 @@ jobs:
           t=meta.read_text().replace('Pokemon ORAS MMO v17.0','ORAS GPU Pokemon Experiment')
           meta.write_text(t)
           PY
+      - name: Fetch compiled native shader for the ARM build
+        uses: actions/download-artifact@v4
+        with:
+          name: OrasPicaShaderHeader
+          path: upstream/3ds_plugin/Includes
       - name: Install pinned 3GX toolchain only
         shell: bash
         run: |
