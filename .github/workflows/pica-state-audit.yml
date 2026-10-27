@@ -1,0 +1,18 @@
+name: Validate PICA register state audit
+on:
+  push:
+    branches: [pica-sprite-compositor-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  state-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile state tracker and failure tests
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror lite/PicaPackets.cpp lite/PicaStateAudit.cpp tests/test_pica_state_audit.cpp -o /tmp/state_audit
+      - name: Verify GPU shadow fails closed
+        run: /tmp/state_audit
