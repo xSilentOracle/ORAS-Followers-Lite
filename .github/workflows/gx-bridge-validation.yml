@@ -1,0 +1,20 @@
+name: Validate offline GX bridge sequencing
+on:
+  push:
+    branches: [pica-sprite-compositor-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bridge-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile no-GPU command bridge tests
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror \
+            lite/GxQueuePlan.cpp lite/GxQueueBridge.cpp \
+            tests/test_gx_queue_bridge.cpp -o /tmp/test_bridge
+      - name: Verify insertion and fail-safe pass-through order
+        run: /tmp/test_bridge
