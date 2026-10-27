@@ -45,8 +45,8 @@ int main(){
         assert(w.WriteMany(0x40,vals.data(),257,true));
         assert(large[0]==0 && large[1]==Header(0x40,15,255,true));
         // first packet: 256 words + header + a 1-word aligner
-        assert(large[258]==0); // pad due to 256 params
-        assert(large[259]==256 && large[260]==Header(0x140,15,0,true));
+        assert(large[257]==0); // pad due to 256 params
+        assert(large[258]==256 && large[259]==Header(0x140,15,0,true));
         assert(w.Finalize());
         assert(w.SizeWords()%4==0);
     }
