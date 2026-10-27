@@ -1,0 +1,20 @@
+name: Validate combined PICA sprite GPU list
+on:
+  push:
+    branches: [pica-sprite-compositor-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  list-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile offline composed PICA draw list
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror lite/PicaPackets.cpp \
+            lite/PicaVertexUpload.cpp lite/PicaSpriteSetup.cpp \
+            lite/PicaDrawArrays.cpp lite/PicaSpriteList.cpp \
+            tests/test_pica_sprite_list.cpp -o /tmp/test_sprite_list
+      - name: Verify full offline encoding and no-submit gate
+        run: /tmp/test_sprite_list
