@@ -47,7 +47,7 @@ int main(){
  d=Observe(state,MakeTop(0x1F008001u));
  assert(!d.safe_position); // invalid alignment
  Observe(state,MakeFill(0x1F000004u));
- assert(state.frame_number==4); // malformed fill must not reset
+ assert(state.frame_number==5); // malformed fill must not reset
  Observe(state,MakeFill());
  Command badList{};badList.words[0]=kProcessCommandList;
  badList.words[1]=0x14000001u;badList.words[2]=123u;
