@@ -1,0 +1,18 @@
+name: Validate offline PICA shader uploader
+on:
+  push:
+    branches: [pica-sprite-compositor-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  uploader-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile bounded PICA shader upload generator
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror lite/PicaPackets.cpp \
+            lite/PicaVertexUpload.cpp tests/test_shader_upload.cpp -o /tmp/uploader_test
+      - name: Run shader upload packet tests
+        run: /tmp/uploader_test
