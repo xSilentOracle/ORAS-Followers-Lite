@@ -1,3 +1,4 @@
+#error "The original in-hook Citro3D renderer caused a console crash. Do not compile this code until GPU queue integration has been replaced."
 // Experimental PICA200 textured quad compositing.
 //
 // Instead of writing the 400x240 LCD framebuffer, the pre-rendered Pokémon
