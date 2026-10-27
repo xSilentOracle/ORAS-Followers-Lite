@@ -55,7 +55,7 @@ int main() {
  assert(recorder.count==4);
  assert(recorder.recorded[0].words[0]==kMemoryFill);
  assert(recorder.recorded[1].words[0]==kProcessCommandList);
- assert(recorder.recorded[2].words[0]==kProcessCommandList);
+ assert(recorder.recorded[2].words[0]==0x01000101u);
  assert(recorder.recorded[2].words[1]==image_list.addr);
  assert(recorder.recorded[3].words[0]==kDisplayTransfer);
  // Original screen transfer must pass unchanged even on duplicate.
