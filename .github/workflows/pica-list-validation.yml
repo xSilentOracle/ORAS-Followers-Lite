@@ -14,7 +14,7 @@ jobs:
         run: |
           g++ -std=c++17 -O2 -Wall -Wextra -Werror lite/PicaPackets.cpp \
             lite/PicaVertexUpload.cpp lite/PicaSpriteSetup.cpp \
-            lite/PicaDrawArrays.cpp lite/PicaSpriteList.cpp \
+            lite/PicaDrawArrays.cpp lite/PicaSpriteFragment.cpp lite/PicaSpriteList.cpp \
             tests/test_pica_sprite_list.cpp -o /tmp/test_sprite_list
       - name: Verify full offline encoding and no-submit gate
         run: /tmp/test_sprite_list
