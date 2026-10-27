@@ -1,0 +1,12 @@
+; SPDX-License-Identifier: MIT
+; Pass-through PICA200 shader: CPU already supplies clip-space position/UV.
+; Intended for a separately serialized GX draw list, NEVER a second C3D frame.
+.out outPos position
+.out outUV texcoord0
+.in inPos v0
+.in inUV v1
+.proc main
+    mov outPos, inPos
+    mov outUV, inUV
+    end
+.end
