@@ -1,0 +1,18 @@
+name: Validate 721 native model archive indexing
+on:
+  push:
+    branches: [native-721-model-loader]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  species-index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test all 721 model lookup paths
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror \
+            native/NativePokemonIndex.cpp native/test_native_pokemon_index.cpp \
+            -o /tmp/native_pokemon_index
+          /tmp/native_pokemon_index
