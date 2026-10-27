@@ -54,7 +54,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          dkp-pacman -Sy --noconfirm --needed 3ds-citro3d 3ds-citro2d
+          dkp-pacman -Sy --noconfirm --needed citro3d citro2d
           CONF=$(dkp-pacman -v -Q 2>/dev/null | sed -n 's/^Conf File *: *//p' | head -n 1)
           [ -n "$CONF" ] || CONF=/opt/devkitpro/pacman/etc/pacman.conf
           awk '/^\[/ { keep = ($0 == "[options]") } keep' "$CONF" > /tmp/ctrpf.conf
