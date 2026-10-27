@@ -25,8 +25,8 @@ bool Append(PicaPackets::Writer& w,const Resources& r){
  // Attributes use 24-byte stride, two vertex input loaders.
  const uint32_t attribFlags[2]={0x7Fu,0x1FFC0000u};
  if(!w.WriteMany(0x0201,attribFlags,2,true) ||
-    !w.Write(0x0242,0xA0000001u,0xBu)||
-    !w.Write(0x0243,1)||
+    !w.Write(0x02B9,0xA0000001u,0xBu)||
+    !w.Write(0x0242,1)||
     !w.Write(0x02BB,0x10u)||!w.Write(0x02BC,0u))return false;
  // devkitPro/citro3d/source/buffers.c:
  // GPU attribute memory address derives from 0x18000000 physical base.
