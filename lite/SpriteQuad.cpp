@@ -3,14 +3,15 @@
 #include <cmath>
 namespace SpriteQuad {
 static Vertex At(float sx,float sy,float u,float v){
-    // ORAS top screen exists in the 256x512 rotated PICA color target:
+    // ORAS top screen occupies a 240x400 rotated PICA render target;
     // (sx, sy) -> (239 - sy, sx), per original DepthProbe::TexelAddr.
-    const float rx=239.f-sy;
+    // Sample centers are (239-sy, sx); rectangle edges are (240-sy, sx).
+    const float rx=240.f-sy;
     const float ry=sx;
     Vertex o{};
-    // Clip-space position for the entire 256x512 render target.
-    o.x=2.f*((rx+0.5f)/256.f)-1.f;
-    o.y=1.f-2.f*((ry+0.5f)/512.f);
+    // Normalize to the visible 240x400 viewport, not padded 256-pixel tiled stride.
+    o.x=2.f*(rx/240.f)-1.f;
+    o.y=1.f-2.f*(ry/400.f);
     o.z=0.f;o.w=1.f;
     o.u=u;
     // PICA texture UV coordinates run bottom-up in Citro3D.
