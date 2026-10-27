@@ -1,0 +1,19 @@
+name: Validate PICA sprite codec (no hardware GPU commands)
+on:
+  push:
+    branches: [pica-sprite-compositor-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  host-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile CPU-only texture staging
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror \
+            lite/PicaFrameCodec.cpp tests/test_pica_codec.cpp -o /tmp/test_pica_codec
+      - name: Run texture and clipping tests
+        run: /tmp/test_pica_codec
